@@ -8,10 +8,10 @@
 int precedence(char op) {
 	switch (op) {
 		case '(':
-			return 3;
+			return 0;
 			break;
 		case ')':
-			return 3;
+			return 0;
 			break;
 		case '*':
 			return 2;
@@ -24,6 +24,9 @@ int precedence(char op) {
 			break;
 		case '-':
 			return 1;
+			break;
+		default:
+			return 0;
 			break;
 	}
 	throw std::invalid_argument("precedence() called on a non-operator");
@@ -45,44 +48,40 @@ bool convertToPostfix(std::string& str) {
 	std::string result;
 	
 	for (int i = 0; i < str.length(); i++) {
-		if (!holdingStack.empty()) {
-			std::cout << "holding stack top: " << holdingStack.top() << std::endl; //" Precedence: " << precedence(holdingStack.top()) << std::endl;
-		}
-		
-		std::cout << "str[i]: " << str[i] << std::endl;
-		
+		// if (!holdingStack.empty()) {
+		// 	std::cout << "holding stack top: " << holdingStack.top() << std::endl; //" Precedence: " << precedence(holdingStack.top()) << std::endl;
+		// }
+				
 		if (isdigit(str[i])) {
 			result.push_back(str[i]);
 		} else if (str[i] == '(') {
 			holdingStack.push(str[i]);
 		} else if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/') {
-			while (!holdingStack.empty()) {
-				if (!(precedence(holdingStack.top()) >= precedence(str[i]))) {
-					break;
+			if (!holdingStack.empty()) {
+				while ((precedence(holdingStack.top()) >= precedence(str[i]))) {
+					result.push_back(holdingStack.top());
+					holdingStack.pop();
+					
+					if (holdingStack.empty()) {
+						break;
+					}
 				}
-				std::cout << "pushing: " << holdingStack.top() << std::endl;
-				result.push_back(holdingStack.top());
-				holdingStack.pop();
 			}
 			holdingStack.push(str[i]);	
 		} else if (str[i] == ')') {
 			while (!holdingStack.empty()) {
 				if (holdingStack.top() == '(') {
-					std::cout << "( found" << std::endl;
 					break;
 				}
-				std::cout << "pushing: " << holdingStack.top() << std::endl;
+				
 				result.push_back(holdingStack.top());
-				std::cout << "result: " << result << std::endl;
 				holdingStack.pop();
 			}
 			// discard the left parenthesis
-			std::cout << holdingStack.empty() << std::endl;
 			holdingStack.pop();
 		}
 	}
 	while (!holdingStack.empty()) {
-		std::cout << "pushing: " << holdingStack.top() << std::endl;
 		result.push_back(holdingStack.top());
 		holdingStack.pop();
 	}
