@@ -35,6 +35,7 @@ int precedence(char op) {
 bool cleanInfix(std::string& str) {
 	// if there's an invalid character, give an error and stop executing this (original regex: "[0-9 () + * \- \/  \s]*")
 	if (!std::regex_match(str, std::regex("[0-9 ( ) + * \\- \\/  \\s]*"))) {
+		str = "ERROR";
 		return false;
 	}
 
@@ -89,22 +90,81 @@ bool convertToPostfix(std::string& str) {
 	return true;
 }
 
+bool evaluatePostfix(std::string& str) {
+	std::stack<int> holdingStack;
+
+	for (int i = 0; i < str.length(); i++) {
+		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/') { // Operator
+			try {
+				if (holdingStack.empty()) {
+					str = "ERROR";
+					return false;
+				}
+				int op1 = holdingStack.top();
+				
+				
+				holdingStack.pop();
+				
+				if (holdingStack.empty()) {
+					str = "ERROR";
+					return false;
+				}
+				int op2 = holdingStack.top();
+				
+				
+				holdingStack.pop();
+				
+				
+				switch (str[i]) {
+					case '*':
+						holdingStack.push(op2 * op1);
+						break;
+					case '/':
+						holdingStack.push(op2 / op1);
+						break;
+					case '+':
+						holdingStack.push(op2 + op1);
+						break;
+					case '-':
+						holdingStack.push(op2 - op1);
+						break;
+				}
+			} catch (...) {
+				str = "ERROR";
+				return false;
+			}
+		} else { // Operand
+			holdingStack.push(str[i] - '0');
+		}
+	}
+	str = std::to_string(holdingStack.top());
+	return true;
+}
+
 bool processEquation (std::string str) {
 	std::cout << "Processing:\t" << str << std::endl;
 	
 	std::cout << "Infix:\t\t";
-	if (cleanInfix(str)) {
-		std::cout << str << std::endl;
-	} else {
-		std::cout << "ERROR" << std::endl << std::endl;
+	bool clean = cleanInfix(str);
+	std::cout << str << std::endl;
+	if (!clean) {
+	std::cout << std::endl;
 		return false;
 	}
 	
 	std::cout << "Postfix:\t";
-	if (convertToPostfix(str)) {
-		std::cout << str << std::endl;
-	} else {
-		std::cout << "ERROR" << std::endl << std::endl;
+	bool conversion = convertToPostfix(str);
+	std::cout << str << std::endl;
+	if (!conversion) {
+		std::cout << std::endl;
+		return false;
+	}
+	
+	std::cout << "Result:\t\t";
+	bool result = evaluatePostfix(str);
+	std::cout << str << std::endl;
+	if (!result) {
+		std::cout << std::endl;
 		return false;
 	}
 	
