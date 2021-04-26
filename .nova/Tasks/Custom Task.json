@@ -1,0 +1,18 @@
+{
+  "actions" : {
+    "build" : {
+      "enabled" : true,
+      "script" : "#!\/bin\/sh\ncd build\nmake"
+    },
+    "clean" : {
+      "enabled" : true,
+      "script" : "#!\/bin\/sh\nrm -rf build\nmkdir build\ncd build\ncmake .."
+    },
+    "run" : {
+      "enabled" : true,
+      "script" : "#!\/bin\/sh\n.\/build\/main"
+    }
+  },
+  "buildBeforeRunning" : true,
+  "identifier" : "B536334E-E48A-418E-B90D-2BA0742869BB"
+}
